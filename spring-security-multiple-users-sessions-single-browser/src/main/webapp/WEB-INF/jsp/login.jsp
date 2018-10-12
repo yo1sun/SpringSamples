@@ -14,7 +14,7 @@
     <title>spring security multiple users sessions in single browser</title>
 </head>
 <body>
-<form name='f' action='/login?_s=${s}' method='POST'>
+<form name='f' action='/loginForward?_s=${s}' method='POST'>
     User: <input type='text' name='username' value=''>
     Password: <input type='password' name='password'/>
     <input type="hidden"

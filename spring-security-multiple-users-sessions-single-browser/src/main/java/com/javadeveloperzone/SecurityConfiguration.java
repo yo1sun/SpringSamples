@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.session.web.http.HttpSessionManager;
 
 
@@ -31,8 +32,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http
+        	.sessionManagement()
+        		// 同じセッションエイリアスで異なるユーザーでログインしたとき継続してしまう
+        		.sessionFixation().newSession()
+        		.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+        	.and()
+        	.csrf().disable()
             .authorizeRequests()
+            .antMatchers("/loginForward").permitAll()
             .anyRequest().authenticated()
             .and()
             .formLogin()
@@ -45,6 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             })
             .failureUrl("/loginFailed")                     // on login failed redirect to this user
             .loginPage("/login")                        // login page
+            .loginProcessingUrl("/loginAuth")
             .permitAll();
     }
 

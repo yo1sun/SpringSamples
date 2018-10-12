@@ -8,8 +8,12 @@ import org.springframework.session.SessionRepository;
 import org.springframework.session.web.http.HttpSessionManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import java.security.Principal;
 
 
@@ -19,7 +23,7 @@ import java.security.Principal;
 @Controller
 public class SpringBootExampleController {
 
-    @RequestMapping(value = "login")
+    @RequestMapping(value = "/login")
     public String login(HttpServletRequest httpRequest,ModelMap map) {
         HttpSessionManager sessionManager = (HttpSessionManager) httpRequest.getAttribute(HttpSessionManager.class.getName());
         String addAlias = sessionManager.getNewSessionAlias(httpRequest);           // it will create new alis used when new user login
@@ -28,10 +32,20 @@ public class SpringBootExampleController {
 
         return "login";
     }
+    
+    @PostMapping(value = "/loginForward")
+    public String aaaa() {
+    	return "forward:/loginAuth";
+    }
+
+    @GetMapping(value = "/loginForward")
+    public String bbb() {
+    	return "forward:/loginAuth";
+    }
 
     @RequestMapping(value = "loginSuccess")
-    public String loginSuccess(HttpServletRequest request,Principal pricipal,ModelMap modelMap){
-       Integer integer =(Integer) request.getSession().getAttribute("hitCounter");
+    public String loginSuccess(HttpServletRequest request,HttpSession session,Principal pricipal,ModelMap modelMap){
+       Integer integer =(Integer) session.getAttribute("hitCounter");
        if(integer==null){
            integer=new Integer(0);
            integer++;
