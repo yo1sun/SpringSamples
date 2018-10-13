@@ -1,13 +1,15 @@
 package com.javadeveloperzone;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.session.web.http.HttpSessionManager;
+
+import com.javadeveloperzone.service.MyAuthFilter;
 
 
 /**
@@ -33,29 +35,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+//        	// custom filter
+//        	.addFilter(myAuthFilter())
         	.sessionManagement()
-        		// 同じセッションエイリアスで異なるユーザーでログインしたとき継続してしまう
+        		// 同じセッションで異なるユーザーでログインしたとき継続してしまう
         		.sessionFixation().newSession()
         		.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
         	.and()
         	.csrf().disable()
             .authorizeRequests()
-            .antMatchers("/loginForward").permitAll()
+            .antMatchers("/login").permitAll()
             .anyRequest().authenticated()
-            .and()
-            .formLogin()
-            .successHandler((httpServletRequest, httpServletResponse, authentication) -> {              // login success handler
-                HttpSessionManager httpSessionManager = (HttpSessionManager) httpServletRequest
-                        .getAttribute(HttpSessionManager.class.getName());
-                String url = httpSessionManager
-                        .encodeURL("loginSuccess", httpSessionManager.getCurrentSessionAlias(httpServletRequest));  // on login success add session alias in url
-                httpServletResponse.sendRedirect(url);
-            })
-            .failureUrl("/loginFailed")                     // on login failed redirect to this user
-            .loginPage("/login")                        // login page
-            .loginProcessingUrl("/loginAuth")
-            .permitAll();
+            ;
     }
-
-
+    
+//    @Bean
+//    public MyAuthFilter myAuthFilter() {
+//    	return new MyAuthFilter();
+//    }
 }
